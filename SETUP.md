@@ -17,12 +17,12 @@ Drop JPGs into `docs/media/` and update the `<figure>` tags in `docs/index.html`
 
 ## 4. Push to GitHub
 ```bash
-cd quarter-car-rig
+cd skyhook-damping-rig
 git init
 git add .
 git commit -m "Initial commit: quarter-car active suspension rig"
 git branch -M main
-git remote add origin https://github.com/YOUR-GITHUB-USERNAME/quarter-car-rig.git
+git remote add origin https://github.com/mramachandran/skyhook-damping-rig.git
 git push -u origin main
 ```
 
@@ -30,7 +30,7 @@ git push -u origin main
 1. On the repo page: **Settings → Pages**
 2. Under "Build and deployment", set **Source: Deploy from a branch**
 3. Branch: `main`, folder: `/docs`
-4. Save — your site will be live at `https://YOUR-GITHUB-USERNAME.github.io/quarter-car-rig/` within a minute or two
+4. Save — your site will be live at `https://mramachandran.github.io/skyhook-damping-rig/` within a minute or two
 
 ## 6. Fill in the placeholders
-Search the repo for `YOUR-GITHUB-USERNAME` and `XX%` and `YOUR_VIDEO_ID` and replace them. The result stat on the landing page auto-computes from `data/comparison_run.csv` once it's real, but the README's number is written by hand — update it too.
+Search the repo for `mramachandran` and `XX%` and `YOUR_VIDEO_ID` and replace them. The result stat on the landing page auto-computes from `data/comparison_run.csv` once it's real, but the README's number is written by hand — update it too.
