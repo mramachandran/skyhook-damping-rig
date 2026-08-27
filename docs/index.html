@@ -91,14 +91,26 @@
 
   /* Build timeline */
   .tl{ list-style:none; margin-top:24px; border-left:1px solid var(--rule); padding-left:0;}
-  .tl-item{ display:flex; gap:24px; padding:0 0 28px 24px; position:relative;}
+  .tl-item{ display:flex; gap:24px; padding:0 0 30px 24px; position:relative;}
   .tl-item::before{
     content:''; position:absolute; left:-5px; top:4px;
     width:9px; height:9px; border-radius:50%; background:var(--active);
   }
-  .tl-date{ font-family:var(--mono); font-size:12px; color:var(--active); min-width:56px; padding-top:1px; flex-shrink:0;}
-  .tl-title{ font-family:var(--mono); font-size:14px; font-weight:700; margin-bottom:6px;}
-  .tl-body p{ color:#C6CFD2; font-size:14px; max-width:600px;}
+  .tl-date{ font-family:var(--mono); font-size:12px; color:var(--active); min-width:72px; padding-top:1px; flex-shrink:0;}
+  .tl-title{ font-family:var(--mono); font-size:14px; font-weight:700; margin:6px 0;}
+  .tl-body p{ color:#C6CFD2; font-size:14px; max-width:620px;}
+  .tags{ display:flex; gap:8px; flex-wrap:wrap; }
+  .tag{
+    font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase;
+    color:var(--muted); border:1px solid var(--rule); padding:3px 8px; border-radius:2px;
+  }
+
+  /* Skills grid */
+  .skillgrid{ display:grid; grid-template-columns:repeat(2, 1fr); gap:14px; margin-top:8px;}
+  .skillcard{ background:var(--panel); border:1px solid var(--rule); padding:18px 20px;}
+  .skillcard-title{ font-family:var(--mono); font-size:13px; font-weight:700; color:var(--active); margin-bottom:8px; text-transform:uppercase; letter-spacing:.03em;}
+  .skillcard p{ color:#C6CFD2; font-size:13.5px; }
+  @media (max-width:640px){ .skillgrid{ grid-template-columns:1fr; } }
 
   /* Media grid */
   .grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:8px;}
@@ -180,42 +192,78 @@
 
   <section id="timeline">
     <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Build timeline</span></div>
-    <p class="body">The mechanical side came first: a quarter-car frame designed in OpenSCAD and 3D printed, sized to hold a coil spring between a fixed base and a moving plate, with mounts for the ToF sensor and servo linkage. Electronics bring-up followed in stages, each sensor validated on its own before wiring everything into one rig.</p>
+    <p class="body">The mechanical side came first: a quarter-car frame designed in OpenSCAD and 3D printed, sized to hold a coil spring between a fixed base and a moving plate, with mounts for the ToF sensor and servo linkage. Electronics bring-up followed in stages — each sensor validated on its own, in code, before anything got wired into the full rig. Several things had to be figured out the hard way; those are called out below rather than smoothed over.</p>
 
     <ol class="tl">
       <li class="tl-item">
         <div class="tl-date">Aug 13</div>
         <div class="tl-body">
-          <div class="tl-title">First ESP32 bring-up</div>
-          <p>Basic I2C scan and board check on the breadboard before any sensors were mounted.</p>
+          <div class="tags"><span class="tag">CAD / 3D printing</span><span class="tag">Embedded C</span></div>
+          <div class="tl-title">Frame designed in OpenSCAD, first ESP32 bring-up</div>
+          <p>Quarter-car frame modeled parametrically in OpenSCAD [add printer + material/settings here — e.g. "printed on a Bambu/Prusa in PLA/PETG"], sized around the coil spring and sensor mounts. In parallel, first ESP32 sketch: an I2C bus scan to confirm the board could see any device at all before wiring real sensors to it.</p>
         </div>
       </li>
       <li class="tl-item">
         <div class="tl-date">Aug 14</div>
         <div class="tl-body">
-          <div class="tl-title">Frame printed, sensors wired one at a time</div>
-          <p>3D-printed frame assembled by hand [note your print settings / material here if worth including]. In parallel: IMU and ToF sensor each wired and tested standalone, servo tested with a serial sweep command, and a multimeter used to trace a wiring fault before it got integrated into the full rig.</p>
+          <div class="tags"><span class="tag">Wiring / debugging</span><span class="tag">Arduino libraries</span></div>
+          <div class="tl-title">Sensors identified, wired, and tested one at a time</div>
+          <p>The IMU scanned as <code>0x70</code>, not the <code>0x68</code> the datasheet search expected — turned out to be an MPU6500 variant, functionally identical to the more common MPU6050 once that was confirmed. The ToF sensor scanned as a VL53L1X, not the more common VL53L0X, which meant switching to the Pololu VL53L1X library rather than the one most tutorials use. Each sensor got its own standalone diagnostic sketch before touching the others — a deliberate staged approach rather than wiring everything at once and debugging blind. Servo tested separately with an interactive serial command tester (sweep, hold, angle).</p>
+        </div>
+      </li>
+      <li class="tl-item">
+        <div class="tl-date">Aug 14–16</div>
+        <div class="tl-body">
+          <div class="tags"><span class="tag">Electrical debugging</span><span class="tag">Rebuild</span></div>
+          <div class="tl-title">Servo jitter traced to a missing common ground — had to redo the power wiring</div>
+          <p>Once the servo was on its own 6V battery pack, it moved erratically even with clean serial commands. The cause: the servo's power rail and the ESP32's USB logic didn't share a ground reference. Tying the two grounds together fixed it — a small fix, but it meant re-checking every prior connection against the same assumption. Separately, an intermittent phantom I2C address (<code>0x03</code>) turned out to be line noise from a loose physical connection, not a code bug — traced with a multimeter rather than guessed at.</p>
         </div>
       </li>
       <li class="tl-item">
         <div class="tl-date">Aug 16</div>
         <div class="tl-body">
-          <div class="tl-title">Sensor integration debugging</div>
-          <p>Combining IMU + ToF + servo on one breadboard surfaced wiring issues that didn't show up testing each part alone — [add a line here on what the actual bug was, e.g. the shared-ground issue noted in CLAUDE.md].</p>
+          <div class="tags"><span class="tag">Breadboard layout</span><span class="tag">Rebuild</span></div>
+          <div class="tl-title">Breadboard wiring rebuilt after a layout mistake</div>
+          <p>The ESP32-WROOM-32D is 9 rows wide, one row too many for clean use of a standard 10-row breadboard — and an early dual-breadboard join was missing an outer power rail, causing hard-to-trace intermittent faults. Fix was to stop trusting the breadboard rails for this and wire several connections point-to-point directly to the ESP32 header pins instead, which removed a whole category of connection variability during debugging.</p>
         </div>
       </li>
       <li class="tl-item">
         <div class="tl-date">Aug 27</div>
         <div class="tl-body">
-          <div class="tl-title">Full rig assembled, closed-loop control confirmed</div>
-          <p>Spring mounted in the printed frame, ToF sensor reading plate position, servo responding to disturbances in real time — skyhook control working end to end on real hardware.</p>
+          <div class="tags"><span class="tag">Control systems</span><span class="tag">Full integration</span></div>
+          <div class="tl-title">Full rig assembled, closed-loop skyhook control confirmed</div>
+          <p>Spring mounted in the printed frame, ToF sensor reading plate position at 100Hz, IMU supplying acceleration only (deliberately not integrated for velocity, to avoid drift), servo responding to disturbances in real time. Toggling <code>SKY:0</code> / <code>SKY:1</code> over serial visibly changes how the plate settles after a push — the control loop working end to end on real hardware, not just in simulation.</p>
         </div>
       </li>
     </ol>
+
+    <p class="body" style="margin-top:24px;">Remaining: a matched passive-vs-active comparison run, logged and plotted, to turn "it visibly works" into a measured percentage.</p>
+  </section>
+
+  <section id="skills">
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Skills this project exercised</span></div>
+    <div class="skillgrid">
+      <div class="skillcard">
+        <div class="skillcard-title">CAD &amp; 3D printing</div>
+        <p>Parametric mechanical design in OpenSCAD; designing for a specific spring, sensor mount, and servo linkage rather than a generic bracket. [Add: printer model, material, any print-quality iterations — e.g. tolerances that needed adjusting after a first print didn't fit.]</p>
+      </div>
+      <div class="skillcard">
+        <div class="skillcard-title">Electrical wiring &amp; debugging</div>
+        <p>Breadboard prototyping, multimeter-based fault tracing, diagnosing a shared-ground issue and I2C line noise from symptoms alone, and rebuilding wiring point-to-point when the breadboard itself was the problem.</p>
+      </div>
+      <div class="skillcard">
+        <div class="skillcard-title">Embedded programming (Arduino / ESP32)</div>
+        <p>Staged bring-up with standalone diagnostic sketches per sensor, then an integrated 100Hz control loop with a serial command interface (<code>SKY</code>, <code>GAIN</code>, <code>STAT</code>, <code>STREAM</code>) for live tuning — plus working across third-party libraries (Pololu VL53L1X, ESP32Servo) instead of assuming the first tutorial's parts list matched the real hardware.</p>
+      </div>
+      <div class="skillcard">
+        <div class="skillcard-title">Controls &amp; systems thinking</div>
+        <p>Implementing a skyhook damping law, understanding the difference between the idealized absolute-reference version and the relative version this rig actually implements with a ToF-derived velocity signal — and documenting that distinction rather than glossing over it.</p>
+      </div>
+    </div>
   </section>
 
   <section id="build">
-    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Build photos</span></div>
+    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Build photos</span></div>
     <div class="grid" id="photoGrid">
       <figure><img src="media/rig-full.jpg" alt="Full quarter-car rig: 3D-printed frame, ToF sensor, spring, and wiring to the breadboard"></figure>
       <figure><img src="media/rig-electronics.jpg" alt="ESP32 and breadboard wiring powering the rig, battery pack alongside"></figure>
@@ -227,7 +275,7 @@
   </section>
 
   <section id="video">
-    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Walkthrough</span></div>
+    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Walkthrough</span></div>
     <p class="body">Replace the video ID below with your uploaded YouTube video's ID (the part after <code>watch?v=</code>).</p>
     <div class="video-wrap">
       <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Quarter-car rig walkthrough" allowfullscreen></iframe>
@@ -235,7 +283,7 @@
   </section>
 
   <section id="why">
-    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Why I built it</span></div>
+    <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">Why I built it</span></div>
     <p class="body">[Write this part yourself — a couple of sentences on what got you started, what was hardest to debug, and what you'd do differently next time. That's the part that makes this read as a real project.]</p>
   </section>
 

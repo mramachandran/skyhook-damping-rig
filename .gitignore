@@ -1,0 +1,20 @@
+# Arduino build artifacts
+*.hex
+*.elf
+*.bin
+build/
+
+# OpenSCAD backups
+*.scad~
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Large raw video (keep on YouTube instead)
+*.mp4
+*.mov
+*.avi
+
+# Editor
+.vscode/
