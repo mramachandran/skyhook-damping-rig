@@ -33,4 +33,4 @@ git push -u origin main
 4. Save — your site will be live at `https://mramachandran.github.io/skyhook-damping-rig/` within a minute or two
 
 ## 6. Fill in the placeholders
-Search the repo for `mramachandran` and `XX%` and `YOUR_VIDEO_ID` and replace them. The result stat on the landing page auto-computes from `data/comparison_run.csv` once it's real, but the README's number is written by hand — update it too.
+Search the repo for `mramachandran` and `YOUR_VIDEO_ID` and replace them. The comparison result (26.6% RMS reduction) is already wired up from the real logged runs in `data/`.
