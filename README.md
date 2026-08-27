@@ -1,8 +1,8 @@
 # Active Quarter-Car Suspension Test Rig
 
-A physical quarter-car suspension rig with a live digital twin, built to test **skyhook active damping** against a passive baseline. Designed and built by Manoj and Jonathan [Last Name] as a hands-on control systems / mechanical engineering project.
+A physical quarter-car suspension rig with a live digital twin, built to test **skyhook active damping** against a passive baseline. Designed and built by Jonathan [Last Name] as a hands-on mechanical & control systems engineering project — from 3D-printed frame and spring selection through embedded control code.
 
-**[Live demo →](https://YOUR-GITHUB-USERNAME.github.io/quarter-car-rig/)**
+**[Live demo →](https://mramachandran.github.io/skyhook-damping-rig/)**
 
 ## What this is
 
@@ -47,11 +47,11 @@ data/         Logged CSVs from passive vs. active comparison runs
 
 ## Photos & video
 
-See the [live demo](https://YOUR-GITHUB-USERNAME.github.io/quarter-car-rig/) for build photos and a walkthrough video. Full-res photos are in `docs/media/`.
+See the [live demo](https://mramachandran.github.io/skyhook-damping-rig/) for build photos and a walkthrough video. Full-res photos are in `docs/media/`.
 
-## Why we built this
+## Why I built this
 
-[A couple sentences here in your own voice — what got you and Jonathan started, what was hardest, what you'd do differently. This is the part that makes it read as a real project, not a tutorial clone — worth writing yourselves.]
+[A couple sentences here in your own voice — what got you started, what was hardest, what you'd do differently. This is the part that makes it read as a real project, not a tutorial clone — worth writing yourself.]
 
 ## License
 

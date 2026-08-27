@@ -89,6 +89,17 @@
   .readout div .k{ font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
   .note{ font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; }
 
+  /* Build timeline */
+  .tl{ list-style:none; margin-top:24px; border-left:1px solid var(--rule); padding-left:0;}
+  .tl-item{ display:flex; gap:24px; padding:0 0 28px 24px; position:relative;}
+  .tl-item::before{
+    content:''; position:absolute; left:-5px; top:4px;
+    width:9px; height:9px; border-radius:50%; background:var(--active);
+  }
+  .tl-date{ font-family:var(--mono); font-size:12px; color:var(--active); min-width:56px; padding-top:1px; flex-shrink:0;}
+  .tl-title{ font-family:var(--mono); font-size:14px; font-weight:700; margin-bottom:6px;}
+  .tl-body p{ color:#C6CFD2; font-size:14px; max-width:600px;}
+
   /* Media grid */
   .grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:8px;}
   .grid figure{ background:var(--panel2); border:1px solid var(--rule); aspect-ratio:4/3; display:flex; align-items:center; justify-content:center; overflow:hidden;}
@@ -167,8 +178,44 @@
     <p class="body">It's worth being precise about what "skyhook" means here: with a ToF-derived velocity signal, this implements <em>relative</em> skyhook damping, not the idealized absolute-inertial-frame version. That's noted in the firmware comments too — the honest caveat is part of the engineering.</p>
   </section>
 
+  <section id="timeline">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Build timeline</span></div>
+    <p class="body">The mechanical side came first: a quarter-car frame designed in OpenSCAD and 3D printed, sized to hold a coil spring between a fixed base and a moving plate, with mounts for the ToF sensor and servo linkage. Electronics bring-up followed in stages, each sensor validated on its own before wiring everything into one rig.</p>
+
+    <ol class="tl">
+      <li class="tl-item">
+        <div class="tl-date">Aug 13</div>
+        <div class="tl-body">
+          <div class="tl-title">First ESP32 bring-up</div>
+          <p>Basic I2C scan and board check on the breadboard before any sensors were mounted.</p>
+        </div>
+      </li>
+      <li class="tl-item">
+        <div class="tl-date">Aug 14</div>
+        <div class="tl-body">
+          <div class="tl-title">Frame printed, sensors wired one at a time</div>
+          <p>3D-printed frame assembled by hand [note your print settings / material here if worth including]. In parallel: IMU and ToF sensor each wired and tested standalone, servo tested with a serial sweep command, and a multimeter used to trace a wiring fault before it got integrated into the full rig.</p>
+        </div>
+      </li>
+      <li class="tl-item">
+        <div class="tl-date">Aug 16</div>
+        <div class="tl-body">
+          <div class="tl-title">Sensor integration debugging</div>
+          <p>Combining IMU + ToF + servo on one breadboard surfaced wiring issues that didn't show up testing each part alone — [add a line here on what the actual bug was, e.g. the shared-ground issue noted in CLAUDE.md].</p>
+        </div>
+      </li>
+      <li class="tl-item">
+        <div class="tl-date">Aug 27</div>
+        <div class="tl-body">
+          <div class="tl-title">Full rig assembled, closed-loop control confirmed</div>
+          <p>Spring mounted in the printed frame, ToF sensor reading plate position, servo responding to disturbances in real time — skyhook control working end to end on real hardware.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
   <section id="build">
-    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Build photos</span></div>
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Build photos</span></div>
     <div class="grid" id="photoGrid">
       <figure><img src="media/rig-full.jpg" alt="Full quarter-car rig: 3D-printed frame, ToF sensor, spring, and wiring to the breadboard"></figure>
       <figure><img src="media/rig-electronics.jpg" alt="ESP32 and breadboard wiring powering the rig, battery pack alongside"></figure>
@@ -180,7 +227,7 @@
   </section>
 
   <section id="video">
-    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Walkthrough</span></div>
+    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Walkthrough</span></div>
     <p class="body">Replace the video ID below with your uploaded YouTube video's ID (the part after <code>watch?v=</code>).</p>
     <div class="video-wrap">
       <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Quarter-car rig walkthrough" allowfullscreen></iframe>
@@ -188,13 +235,13 @@
   </section>
 
   <section id="why">
-    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Why we built it</span></div>
-    <p class="body">[Write this part yourselves — a couple of sentences on what got you started, what was hardest to debug, and what you'd do differently next time. That's the part that makes this read as a real project.]</p>
+    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Why I built it</span></div>
+    <p class="body">[Write this part yourself — a couple of sentences on what got you started, what was hardest to debug, and what you'd do differently next time. That's the part that makes this read as a real project.]</p>
   </section>
 
   <footer>
     <div class="tb-repo"><a href="https://github.com/mramachandran/skyhook-damping-rig">Full source, firmware & CAD →</a></div>
-    <div class="credit">Built by Manoj & Jonathan · ESP32 · MPU6500 · VL53L1X · MG90S</div>
+    <div class="credit">Built by Jonathan [Last Name] · ESP32 · MPU6500 · VL53L1X · MG90S</div>
   </footer>
 
 </main>
