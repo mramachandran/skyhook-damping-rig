@@ -89,6 +89,31 @@
   .readout div .k{ font-family:var(--mono); font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em;}
   .note{ font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:14px; }
 
+  /* Results table */
+  .resultstable{ width:100%; border-collapse:collapse; margin-top:20px; font-size:13.5px;}
+  .resultstable th{
+    font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--muted); text-align:left; padding:8px 12px; border-bottom:1px solid var(--rule);
+  }
+  .resultstable td{ padding:10px 12px; border-bottom:1px solid var(--grid); color:#C6CFD2; }
+  .resultstable tr.active-row td{ color:var(--text); }
+  .resultstable tr.active-row td:first-child{ color:var(--active); font-weight:600;}
+  .resultstable code{ font-family:var(--mono); font-size:12px; color:var(--muted);}
+
+  /* Methodology callout */
+  .methodology{
+    background:var(--panel2); border:1px solid var(--active); border-left-width:3px;
+    padding:16px 20px; margin-top:22px;
+  }
+  .methodology-title{
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--active);
+    text-transform:uppercase; letter-spacing:.05em; margin-bottom:10px;
+  }
+  .methodology ul{ margin:0; padding-left:18px; }
+  .methodology li{ color:#C6CFD2; font-size:13px; margin-bottom:8px; line-height:1.55; }
+  .methodology li:last-child{ margin-bottom:0; }
+  .methodology strong{ color:var(--text); }
+
   /* Build timeline */
   .tl{ list-style:none; margin-top:24px; border-left:1px solid var(--rule); padding-left:0;}
   .tl-item{ display:flex; gap:24px; padding:0 0 30px 24px; position:relative;}
@@ -145,7 +170,7 @@
 
     <div class="statline">
       <div class="stat">
-        <div class="num" id="reduction-stat">XX%</div>
+        <div class="num" id="reduction-stat">27%</div>
         <div class="label">Peak displacement reduction</div>
       </div>
       <div class="stat">
@@ -161,11 +186,11 @@
 
   <section id="run">
     <div class="sec-head"><span class="sec-num">01</span><span class="sec-title">The comparison run</span></div>
-    <p class="body">Replay of a logged run: the same disturbance applied to the plate with the servo passive, then with skyhook control active. This isn't simulated — it's the rig's actual telemetry, played back at real time.</p>
+    <p class="body">Two logged runs, same rig: one with the servo passive, one with skyhook control active. Position is plotted as deviation from each run's own resting height, since the two runs settle at slightly different rest distances from the ToF sensor — what matters for ride quality is how far the plate swings around wherever it settles, not the raw sensor reading.</p>
 
     <div class="scope">
       <div class="scope-head">
-        <div class="scope-title">Body displacement — passive vs. active</div>
+        <div class="scope-title">Body displacement — passive vs. active (deviation from rest)</div>
         <div class="controls">
           <div class="legend">
             <span><span class="swatch" style="background:var(--passive)"></span>Passive</span>
@@ -180,8 +205,42 @@
         <div><div class="v" id="ro-passive">—</div><div class="k">Passive (mm)</div></div>
         <div><div class="v" id="ro-active">—</div><div class="k">Active (mm)</div></div>
       </div>
-      <div class="note">⚠ Placeholder data — swap in <code>data/comparison_run.csv</code> once the real passive-vs-active run is logged. See the script at the bottom of this file.</div>
     </div>
+
+    <div class="methodology">
+      <div class="methodology-title">⚠ Methodology &amp; honest limitations</div>
+      <ul>
+        <li><strong>Not a calibrated zero.</strong> <code>pos_mm</code> is raw ToF distance, and the two runs settled at slightly different rest heights (11.8mm vs. 18.7mm). Each run is re-centered on its own mean before comparing — the correct way to measure oscillation amplitude, not absolute position.</li>
+        <li><strong>Peak displacement is higher on the active run</strong> (19.8mm vs. 14.4mm) — not a bad result. The active run includes one large deliberate disturbance test around t=19s that the passive run didn't get, so the two peaks aren't a matched comparison.</li>
+        <li><strong>RMS over the full session is the headline metric</strong> (26.6% reduction) because it's the standard vibration measure and isn't skewed by one outlier event the way peak is. Peak is still shown in the table below for transparency, not hidden because it looks worse.</li>
+        <li><strong>Runs weren't matched in duration or disturbance protocol</strong> (84.0s vs. 80.1s, different pluck timing). A tighter follow-up — same disturbance, same duration, ideally several repeated trials — would make the number more defensible than a single pair of runs.</li>
+      </ul>
+    </div>
+
+    <table class="resultstable">
+      <thead>
+        <tr><th>Run</th><th>Duration</th><th>Rest position</th><th>Mean |deviation|</th><th>RMS</th><th>Peak</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Passive (<code>SKY:0</code>)</td>
+          <td>84.0s</td>
+          <td>11.8mm</td>
+          <td>4.17mm</td>
+          <td>5.10mm</td>
+          <td>14.4mm</td>
+        </tr>
+        <tr class="active-row">
+          <td>Skyhook active (<code>SKY:1</code>)</td>
+          <td>80.1s</td>
+          <td>18.7mm</td>
+          <td>3.10mm</td>
+          <td>3.75mm</td>
+          <td>19.8mm</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">Raw logs: <a href="../data/rig_run_1_skyon.csv">rig_run_1_skyon.csv</a>, <a href="../data/rig_run_2_skyoff.csv">rig_run_2_skyoff.csv</a>.</p>
   </section>
 
   <section id="system">
@@ -190,8 +249,20 @@
     <p class="body">It's worth being precise about what "skyhook" means here: with a ToF-derived velocity signal, this implements <em>relative</em> skyhook damping, not the idealized absolute-inertial-frame version. That's noted in the firmware comments too — the honest caveat is part of the engineering.</p>
   </section>
 
+  <section id="dashboard">
+    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">The dashboard</span></div>
+    <p class="body">Alongside the firmware, a browser-based dashboard was built to run and tune the rig without needing the Arduino IDE open — just Chrome or Edge, connected over the Web Serial API. It shows five live telemetry sparklines (position, velocity, acceleration, force command, servo angle), an animated diagram of the rig itself, one-click controls to toggle skyhook on/off and adjust gain, a hardware health check, and a recording panel that logs a run to CSV, computes RMS/peak displacement, and plots it live — the same recording panel that produced the comparison table above.</p>
+
+    <div class="grid" style="grid-template-columns:1fr; gap:14px;">
+      <figure><img src="media/dashboard-controls.jpg" alt="Dashboard live view: telemetry sparklines, skyhook controls, and hardware health panel with SKY ON active"></figure>
+      <figure><img src="media/dashboard-carview.jpg" alt="Dashboard car-view diagram and run recording panel with RMS/peak displacement stats"></figure>
+    </div>
+    <p class="note" style="margin-top:14px;">Top: live telemetry and controls, skyhook active. Bottom: the animated quarter-car diagram and the recording panel used to capture the passive-vs-active comparison run.</p>
+  </section>
+
+
   <section id="timeline">
-    <div class="sec-head"><span class="sec-num">03</span><span class="sec-title">Build timeline</span></div>
+    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Build timeline</span></div>
     <p class="body">The mechanical side came first: a quarter-car frame designed in OpenSCAD and 3D printed, sized to hold a coil spring between a fixed base and a moving plate, with mounts for the ToF sensor and servo linkage. Electronics bring-up followed in stages — each sensor validated on its own, in code, before anything got wired into the full rig. Several things had to be figured out the hard way; those are called out below rather than smoothed over.</p>
 
     <ol class="tl">
@@ -241,7 +312,7 @@
   </section>
 
   <section id="skills">
-    <div class="sec-head"><span class="sec-num">04</span><span class="sec-title">Skills this project exercised</span></div>
+    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Skills this project exercised</span></div>
     <div class="skillgrid">
       <div class="skillcard">
         <div class="skillcard-title">CAD &amp; 3D printing</div>
@@ -259,11 +330,15 @@
         <div class="skillcard-title">Controls &amp; systems thinking</div>
         <p>Implementing a skyhook damping law, understanding the difference between the idealized absolute-reference version and the relative version this rig actually implements with a ToF-derived velocity signal — and documenting that distinction rather than glossing over it.</p>
       </div>
+      <div class="skillcard">
+        <div class="skillcard-title">Software / dashboard development</div>
+        <p>A browser-based control panel built on the Web Serial API — live telemetry sparklines, one-click skyhook toggle and gain tuning, a hardware health check, and CSV run recording with RMS/peak stats — built so the rig can be operated and demonstrated without an IDE open.</p>
+      </div>
     </div>
   </section>
 
   <section id="build">
-    <div class="sec-head"><span class="sec-num">05</span><span class="sec-title">Build photos</span></div>
+    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Build photos</span></div>
     <div class="grid" id="photoGrid">
       <figure><img src="media/rig-full.jpg" alt="Full quarter-car rig: 3D-printed frame, ToF sensor, spring, and wiring to the breadboard"></figure>
       <figure><img src="media/rig-electronics.jpg" alt="ESP32 and breadboard wiring powering the rig, battery pack alongside"></figure>
@@ -271,11 +346,12 @@
       <figure><img src="media/tof-sensor.jpg" alt="VL53L1X time-of-flight sensor breakout board, close-up"></figure>
       <figure><img src="media/debugging.jpg" alt="Multimeter checking continuity during wiring debug"></figure>
       <figure><img src="media/jonathan-building.jpg" alt="Jonathan assembling the 3D-printed rig frame"></figure>
+      <figure><img src="media/breadboard-detail.jpg" alt="Close-up of the ESP32 breadboard with battery pack, shallow depth of field"></figure>
     </div>
   </section>
 
   <section id="video">
-    <div class="sec-head"><span class="sec-num">06</span><span class="sec-title">Walkthrough</span></div>
+    <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">Walkthrough</span></div>
     <p class="body">Replace the video ID below with your uploaded YouTube video's ID (the part after <code>watch?v=</code>).</p>
     <div class="video-wrap">
       <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" title="Quarter-car rig walkthrough" allowfullscreen></iframe>
@@ -283,7 +359,7 @@
   </section>
 
   <section id="why">
-    <div class="sec-head"><span class="sec-num">07</span><span class="sec-title">Why I built it</span></div>
+    <div class="sec-head"><span class="sec-num">08</span><span class="sec-title">Why I built it</span></div>
     <p class="body">[Write this part yourself — a couple of sentences on what got you started, what was hardest to debug, and what you'd do differently next time. That's the part that makes this read as a real project.]</p>
   </section>
 
@@ -296,8 +372,11 @@
 
 <script>
 /* ---- Replay chart ----
-   Reads data/comparison_run.csv with columns: t,passive_mm,active_mm
-   Falls back to synthetic placeholder data if the file isn't found yet.
+   Reads the two real logged runs: data/rig_run_1_skyon.csv (active) and
+   data/rig_run_2_skyoff.csv (passive). Each has columns time_s,pos_mm,vel_mms,accel_g,u_cmd_N,servo_deg,sky_on
+   Position is re-centered on each run's own mean (rest position differs slightly between runs
+   since it's raw ToF distance, not a calibrated zero). Falls back to synthetic data if the files
+   aren't found yet.
 */
 const chart = document.getElementById('chart');
 const playBtn = document.getElementById('playBtn');
@@ -307,37 +386,58 @@ const roActive = document.getElementById('ro-active');
 const reductionStat = document.getElementById('reduction-stat');
 
 function synthesize(){
-  // Placeholder: step disturbance, passive underdamped, active damps faster
   const pts = [];
   for(let i=0;i<300;i++){
     const t = i*0.02;
-    const disturb = t>0.3 && t<0.5 ? 1 : 0;
-    const passive = disturb || t>=0.5 ? Math.exp(-1.2*(t-0.3)) * Math.cos(14*(t-0.3)) * (t>=0.3?1:0) * 18 : 0;
-    const active = disturb || t>=0.5 ? Math.exp(-4.5*(t-0.3)) * Math.cos(14*(t-0.3)) * (t>=0.3?1:0) * 18 : 0;
-    pts.push({t, passive, active});
+    const passive = Math.exp(-1.2*t) * Math.cos(14*t) * 18;
+    const active = Math.exp(-4.5*t) * Math.cos(14*t) * 18;
+    pts.push({t, v: passive});
   }
-  return pts;
+  const active = pts.map(p=>({t:p.t, v: p.v * 0.35}));
+  return { passive: pts, active };
+}
+
+async function loadRun(path){
+  const res = await fetch(path);
+  if(!res.ok) throw new Error('missing ' + path);
+  const text = await res.text();
+  const lines = text.trim().split('\n');
+  const header = lines[0].split(',');
+  const tIdx = header.indexOf('time_s');
+  const pIdx = header.indexOf('pos_mm');
+  const rows = lines.slice(1).map(l=>{
+    const cols = l.split(',');
+    return { t: parseFloat(cols[tIdx]), pos: parseFloat(cols[pIdx]) };
+  });
+  const mean = rows.reduce((s,r)=>s+r.pos,0)/rows.length;
+  return rows.map(r=>({ t: r.t - rows[0].t, v: r.pos - mean }));
 }
 
 async function loadData(){
   try{
-    const res = await fetch('../data/comparison_run.csv');
-    if(!res.ok) throw new Error('no file yet');
-    const text = await res.text();
-    const lines = text.trim().split('\n').slice(1);
-    return lines.map(l=>{
-      const [t,passive,active] = l.split(',').map(Number);
-      return {t, passive, active};
-    });
+    const [active, passive] = await Promise.all([
+      loadRun('../data/rig_run_1_skyon.csv'),
+      loadRun('../data/rig_run_2_skyoff.csv')
+    ]);
+    return { passive, active };
   }catch(e){
     return synthesize();
   }
 }
 
+function rms(series){
+  return Math.sqrt(series.reduce((s,p)=>s+p.v*p.v,0)/series.length);
+}
+
 function drawStatic(data){
   const w=900,h=260,pad=20;
-  const maxAbs = Math.max(...data.map(d=>Math.max(Math.abs(d.passive),Math.abs(d.active)))) || 1;
-  const xScale = t => pad + (t/data[data.length-1].t) * (w-2*pad);
+  const { passive, active } = data;
+  const maxAbs = Math.max(
+    ...passive.map(d=>Math.abs(d.v)),
+    ...active.map(d=>Math.abs(d.v))
+  ) || 1;
+  const maxDur = Math.max(passive[passive.length-1].t, active[active.length-1].t);
+  const xScale = t => pad + (t/maxDur) * (w-2*pad);
   const yScale = v => h/2 - (v/maxAbs) * (h/2-pad);
 
   const gridLines = [];
@@ -346,46 +446,60 @@ function drawStatic(data){
     gridLines.push(`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="var(--grid)" stroke-width="1"/>`);
   }
 
-  const passivePath = data.map((d,i)=> (i===0?'M':'L') + xScale(d.t).toFixed(1) + ',' + yScale(d.passive).toFixed(1)).join(' ');
-  const activePath = data.map((d,i)=> (i===0?'M':'L') + xScale(d.t).toFixed(1) + ',' + yScale(d.active).toFixed(1)).join(' ');
+  const passivePath = passive.map((d,i)=> (i===0?'M':'L') + xScale(d.t).toFixed(1) + ',' + yScale(d.v).toFixed(1)).join(' ');
+  const activePath = active.map((d,i)=> (i===0?'M':'L') + xScale(d.t).toFixed(1) + ',' + yScale(d.v).toFixed(1)).join(' ');
 
   chart.innerHTML = `
     ${gridLines.join('')}
     <line x1="${pad}" y1="${h/2}" x2="${w-pad}" y2="${h/2}" stroke="var(--rule)" stroke-width="1"/>
-    <path d="${passivePath}" fill="none" stroke="var(--passive)" stroke-width="1.5" opacity="0.5"/>
-    <path d="${activePath}" fill="none" stroke="var(--active)" stroke-width="1.5" opacity="0.5"/>
+    <path d="${passivePath}" fill="none" stroke="var(--passive)" stroke-width="1.3" opacity="0.55"/>
+    <path d="${activePath}" fill="none" stroke="var(--active)" stroke-width="1.3" opacity="0.55"/>
     <circle id="cursorP" cx="0" cy="0" r="4" fill="var(--passive)" opacity="0"/>
     <circle id="cursorA" cx="0" cy="0" r="4" fill="var(--active)" opacity="0"/>
   `;
 
-  const passivePeak = Math.max(...data.map(d=>Math.abs(d.passive)));
-  const activePeak = Math.max(...data.map(d=>Math.abs(d.active)));
-  const reduction = passivePeak>0 ? Math.round((1 - activePeak/passivePeak)*100) : 0;
+  const rmsPassive = rms(passive);
+  const rmsActive = rms(active);
+  const reduction = rmsPassive>0 ? Math.round((1 - rmsActive/rmsPassive)*100) : 0;
   reductionStat.textContent = reduction + '%';
 
-  return {xScale, yScale};
+  return {xScale, yScale, maxDur};
 }
 
 let playing = false;
 loadData().then(data=>{
-  const {xScale,yScale} = drawStatic(data);
+  const {xScale,yScale,maxDur} = drawStatic(data);
+  const { passive, active } = data;
   const cursorP = ()=>document.getElementById('cursorP');
   const cursorA = ()=>document.getElementById('cursorA');
+
+  function valueAt(series, t){
+    // simple nearest-sample lookup
+    let lo=0, hi=series.length-1;
+    while(lo<hi){
+      const mid=(lo+hi)>>1;
+      if(series[mid].t < t) lo=mid+1; else hi=mid;
+    }
+    return series[lo];
+  }
 
   function play(){
     if(playing) return;
     playing = true;
+    const steps = 400;
     let i = 0;
     cursorP().setAttribute('opacity','1');
     cursorA().setAttribute('opacity','1');
     const step = ()=>{
-      if(i>=data.length || !playing){ playing=false; return; }
-      const d = data[i];
-      cursorP().setAttribute('cx', xScale(d.t)); cursorP().setAttribute('cy', yScale(d.passive));
-      cursorA().setAttribute('cx', xScale(d.t)); cursorA().setAttribute('cy', yScale(d.active));
-      roTime.textContent = d.t.toFixed(2)+'s';
-      roPassive.textContent = d.passive.toFixed(1);
-      roActive.textContent = d.active.toFixed(1);
+      if(i>steps || !playing){ playing=false; return; }
+      const t = (i/steps) * maxDur;
+      const dp = valueAt(passive, t);
+      const da = valueAt(active, t);
+      cursorP().setAttribute('cx', xScale(dp.t)); cursorP().setAttribute('cy', yScale(dp.v));
+      cursorA().setAttribute('cx', xScale(da.t)); cursorA().setAttribute('cy', yScale(da.v));
+      roTime.textContent = t.toFixed(2)+'s';
+      roPassive.textContent = dp.v.toFixed(1);
+      roActive.textContent = da.v.toFixed(1);
       i++;
       setTimeout(()=>requestAnimationFrame(step), 20);
     };

@@ -15,8 +15,13 @@ The goal: measure how much skyhook control reduces body displacement versus the 
 
 ## Result
 
-> **XX% reduction in peak body displacement** with skyhook active vs. passive, under a matched step disturbance.
-> *(Fill in once the comparison run is logged — see `/data`)*
+> **26.6% reduction in RMS body displacement** with skyhook active vs. passive, measured over two full logged sessions.
+> *(Peak-displacement comparisons are noisier since disturbance timing/magnitude wasn't identical between runs — RMS over the full session is the standard, more robust vibration metric. See `data/README.md` for the raw numbers.)*
+
+**Methodology & honest limitations** (full detail on the live site):
+- Position is raw ToF distance, not a calibrated zero — each run is re-centered on its own mean before comparing.
+- Peak displacement is actually *higher* on the active run, because that run includes one large deliberate disturbance test the passive run didn't get — not a matched comparison, which is why RMS (not peak) is the headline number.
+- The two runs weren't matched in duration or disturbance protocol. A tighter follow-up — same disturbance, same duration, several repeated trials — would make the result more defensible than this single pair of runs.
 
 ## How it works
 
